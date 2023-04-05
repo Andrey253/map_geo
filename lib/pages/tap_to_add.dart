@@ -58,8 +58,14 @@ class TapToAddPageState extends State<TapToAddPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tap to add pins'),
-        actions: actions(tappedPoints, setState, index, isDeleting,
-            () => setState(() => isDeleting = !isDeleting), (i) => index = i,reDrawCircleMarkers),
+        actions: actions(
+            tappedPoints,
+            setState,
+            index,
+            isDeleting,
+            () => setState(() => isDeleting = !isDeleting),
+            (i) => index = i,
+            reDrawCircleMarkers),
       ),
       drawer: buildDrawer(context, TapToAddPage.route),
       body: Padding(
@@ -124,25 +130,52 @@ class TapToAddPageState extends State<TapToAddPage> {
     );
   }
 
-  void _handleTap(TapPosition tapPosition, LatLng latlng)  {
+  void _handleTap(TapPosition tapPosition, LatLng latlng) {
     final latLngCircle = LatLngCircle(
         latLng: latlng,
         timing: 1,
         editing: false,
-      listDouobleLatLng: drawCirklePoints(latlng, 1));
+        listDouobleLatLng: drawCirklePoints(latlng, 1));
     tappedPoints.add(latLngCircle);
     index = tappedPoints.indexOf(latLngCircle);
-setState(() {
-  
-});
+    setState(() {});
   }
 
-  void reDrawCircleMarkers()  {
-    allCircleMarkers = tappedPoints.fold(
-        [],
-        (previousValue, element) => previousValue
-          ..addAll(markerOfCircle(element.listDouobleLatLng.map((e) => e.big).toList(),true))
-          ..addAll(markerOfCircle(element.listDouobleLatLng.map((e) => e.small).toList(),false)));
+  void reDrawCircleMarkers() {
+    // allCircleMarkers = tappedPoints.fold(
+    //     [],
+    //     (previousValue, element) => previousValue
+    //       ..addAll(markerOfCircle(element.listDouobleLatLng.map((e) => e.big).toList(),true))
+    //       ..addAll(markerOfCircle(element.listDouobleLatLng.map((e) => e.small).toList(),false)));
+    double up(double num) {
+      return num > 0 ? num * 1.01 : num * 0.99;
+    }
+
+    double down(double num) {
+      return num < 0 ? num * 1.01 : num * 0.99;
+    }
+
+    if (tappedPoints.length == 2) {
+      allCircleMarkers.clear();
+      for (var d in tappedPoints[0].listDouobleLatLng) {
+        for (var big in tappedPoints[1].listDouobleLatLng.map((e) => e.big)) {
+          if (((up(d.big.latitude) > big.latitude &&
+                      down(d.small.latitude) < big.latitude) ||
+                  (down(d.big.latitude) < big.latitude &&
+                      up(d.small.latitude) > big.latitude)) &&
+              //////
+              ((up(d.big.longitude) > big.longitude &&
+                      down(d.small.longitude) < big.longitude) ||
+                  (down(d.big.longitude) < big.longitude &&
+                      up(d.small.longitude) > big.longitude))) {
+            allCircleMarkers.add(Marker(
+                point: big,
+                builder: (context) =>
+                    const Icon(Icons.lens, size: 8, color: Colors.blue)));
+          }
+        }
+      }
+    }
     setState(() {});
     // await Future.delayed(const Duration(seconds: 1));
     // allCircleMarkers.clear();
