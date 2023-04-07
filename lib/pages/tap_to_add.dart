@@ -4,6 +4,8 @@ import 'package:map_test/widgets/drawer.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:positioned_tap_detector_2/positioned_tap_detector_2.dart';
 
+import '../data_class/latlng_position.dart';
+
 class TapToAddPage extends StatefulWidget {
   static const String route = '/tap';
 
@@ -16,10 +18,13 @@ class TapToAddPage extends StatefulWidget {
 }
 
 class TapToAddPageState extends State<TapToAddPage> {
-  List<LatLng> tappedPoints = [];
+  List<LatLngPosition> tappedPoints = [];
   bool isDeleting = false;
   MapController mapController = MapController();
   int index = -1;
+  List<Marker> markers = [];
+  double x = 0;
+  double y = 0;
   @override
   void initState() {
     mapController.mapEventStream.listen((event) {
@@ -30,11 +35,11 @@ class TapToAddPageState extends State<TapToAddPage> {
 
   @override
   Widget build(BuildContext context) {
-    final markers = tappedPoints.map((latlng) {
+    markers = tappedPoints.asMap().entries.map((entri) {
       return Marker(
         width: 80,
         height: 80,
-        point: latlng,
+        point: entri.value.latLng,
         builder: (ctx) => GestureDetector(
           child: Icon(Icons.place),
           onLongPressMoveUpdate: (details) {
@@ -42,16 +47,27 @@ class TapToAddPageState extends State<TapToAddPage> {
             print('teg globalPosition ${details.globalPosition}');
             print('teg localPosition ${details.localPosition}');
             print('teg offsetFromOrigin ${details.offsetFromOrigin}');
+            tappedPoints[entri.key] = LatLngPosition(
+                latLng: LatLng(
+                    entri.value.latLng.latitude -
+                        (details.globalPosition.dy -entri.value.y) *
+                        0.0002,
+                    entri.value.latLng.longitude +
+                        (details.globalPosition.dx -entri.value.x) *
+                        0.0002),
+                x:details.globalPosition.dx,y:details.globalPosition.dy
+                    );
+            setState(() {});
           },
           onLongPressUp: () {
-            index = tappedPoints.indexOf(latlng);
+            index = tappedPoints.indexOf(entri.value);
             print('teg onLongPressUp ${index}');
           },
           onLongPress: () {
-            index = tappedPoints.indexOf(latlng);
+            index = tappedPoints.indexOf(entri.value);
             print('teg onLongPress ${index}');
 
-            if (isDeleting) tappedPoints.remove(latlng);
+            if (isDeleting) tappedPoints.remove(entri);
 
             setState(() {});
           },
@@ -62,7 +78,7 @@ class TapToAddPageState extends State<TapToAddPage> {
     }).toList();
     final circleMarkers = tappedPoints
         .map((e) => CircleMarker(
-            point: e,
+            point: e.latLng,
             color: Colors.blue.withOpacity(0.3),
             borderStrokeWidth: 2,
             useRadiusInMeter: true,
@@ -70,7 +86,7 @@ class TapToAddPageState extends State<TapToAddPage> {
             ))
         .toList()
       ..addAll(tappedPoints.map((e) => CircleMarker(
-          point: e,
+          point: e.latLng,
           color: Colors.blue.withOpacity(0.0),
           borderStrokeWidth: 2,
           useRadiusInMeter: true,
@@ -147,7 +163,9 @@ class TapToAddPageState extends State<TapToAddPage> {
 
   void _handleTap(TapPosition tapPosition, LatLng latlng) {
     setState(() {
-      tappedPoints.add(latlng);
+      tappedPoints
+          .add(LatLngPosition(latLng: latlng, x: tapPosition.global.dx,y:tapPosition.global.dy ));
+      // print('teg x ${tapPosition.relative?.dx} y ${tapPosition.relative?.dy}');
     });
   }
 }
