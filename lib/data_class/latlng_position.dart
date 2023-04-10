@@ -2,14 +2,25 @@
 import 'package:latlong2/latlong.dart';
 import 'package:positioned_tap_detector_2/positioned_tap_detector_2.dart';
 
-class LatLngPosition {
+class LatLngCircle {
   LatLng latLng;
-  double x;
-  double y;
-  LatLngPosition({
+  int timing;
+  bool editing;
+  LatLngCircle({
     required this.latLng,
-    required this.x,
-    required this.y,
+    required this.timing,
+    required this.editing,
   });
 
+  LatLngCircle copyWith({
+    LatLng? latLng,
+    int? timing,
+    bool? editing,
+  }) {
+    return LatLngCircle(
+      latLng: latLng ?? this.latLng,
+      timing: timing ?? this.timing,
+      editing: editing ?? this.editing,
+    );
+  }
 }
