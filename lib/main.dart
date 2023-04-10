@@ -9,7 +9,7 @@ import 'package:map_test/pages/plugin_scalebar.dart';
 import 'package:map_test/pages/plugin_zoombuttons.dart';
 import 'package:map_test/pages/point_to_latlng.dart';
 import 'package:map_test/pages/tap_to_add.dart';
-
+//cd D:/Flutter_apps/fast;flutter build web ; cd build/web;git add .;git commit -m "standart commit"; git push -u origin main
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
