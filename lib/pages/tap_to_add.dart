@@ -9,6 +9,7 @@ import 'package:positioned_tap_detector_2/positioned_tap_detector_2.dart';
 import '../data_class/latlng_position.dart';
 import '../methods/calc.dart';
 import '../methods/list_circles.dart';
+import '../methods/marker_of_circle.dart';
 
 class TapToAddPage extends StatefulWidget {
   static const String route = '/tap';
@@ -28,8 +29,10 @@ class TapToAddPageState extends State<TapToAddPage> {
   int index = -1;
   var dist;
   List<Marker> markers = [];
+
   double x = 0;
   double y = 0;
+  var p = 0.017453292519943295;
   @override
   void initState() {
     // mapController.mapEventStream.listen((event) {
@@ -41,12 +44,15 @@ class TapToAddPageState extends State<TapToAddPage> {
 
   @override
   Widget build(BuildContext context) {
-    markers = getMarkers(tappedPoints, setState, (i) => index = i, isDeleting);
+    markers = getMarkers(tappedPoints, setState, (i) => index = i,
+        isDeleting, () => isDeleting = false);
 
     var listLatLng = tappedPoints.map((e) => e.latLng).toList();
     if (markers.length > 1) {
       dist = calculateDistance(listLatLng[0], listLatLng[1]);
+      // calculateDistanceTwo(listLatLng[0], listLatLng[1]);
     }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tap to add pins'),
@@ -105,6 +111,7 @@ class TapToAddPageState extends State<TapToAddPage> {
                       polylines: [Polyline(points: listLatLng)],
                     ),
                     MarkerLayer(markers: markers),
+                    MarkerLayer(markers: tappedPoints.fold([], (previousValue, element) => previousValue..addAll(element.points))),
                   ],
                 ),
               ),
@@ -116,11 +123,14 @@ class TapToAddPageState extends State<TapToAddPage> {
   }
 
   void _handleTap(TapPosition tapPosition, LatLng latlng) {
-    setState(() {
-      final latLngCircle =
-          LatLngCircle(latLng: latlng, timing: 1, editing: false);
-      tappedPoints.add(latLngCircle);
-      index = tappedPoints.indexOf(latLngCircle);
-    });
+    final latLngCircle = LatLngCircle(
+        latLng: latlng,
+        timing: 1,
+        editing: false,
+        points: drawCirklePoints(latlng, 1));
+    tappedPoints.add(latLngCircle);
+    index = tappedPoints.indexOf(latLngCircle);
+
+    setState(() {});
   }
 }

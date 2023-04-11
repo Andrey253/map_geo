@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:map_test/methods/marker_of_circle.dart';
 
 import '../data_class/latlng_position.dart';
 import '../pages/tap_to_add.dart';
-
 
 List<CircleMarker> getListCircles(List<LatLngCircle> tappedPoints) {
   return tappedPoints
@@ -22,12 +22,17 @@ List<CircleMarker> getListCircles(List<LatLngCircle> tappedPoints) {
         borderColor: Colors.black,
         borderStrokeWidth: 1,
         useRadiusInMeter: true,
-        radius: TapToAddPage.timingDistance * (e.timing + 1) // 2000 meters | 2 km
+        radius:
+            TapToAddPage.timingDistance * (e.timing + 1) // 2000 meters | 2 km
         )));
 }
 
-List<Marker> getMarkers(List<LatLngCircle> tappedPoints,
-    void Function(Function()) setS, Function(int) setIndex, bool isDeleting) {
+List<Marker> getMarkers(
+    List<LatLngCircle> tappedPoints,
+    void Function(Function()) setS,
+    Function(int) setIndex,
+    bool isDeleting,
+    Function() resetdELETING) {
   return tappedPoints.map((entri) {
     return Marker(
       width: 80,
@@ -41,13 +46,20 @@ List<Marker> getMarkers(List<LatLngCircle> tappedPoints,
                 if (isDeleting) {
                   setIndex(-1);
                   tappedPoints.remove(entri);
+                  resetdELETING();
                 }
               }),
-          onLongPressUp: () => setS(() => setIndex(-1)),
+          onLongPressUp: () => setS(() {
+                setIndex(-1);
+                entri.points = drawCirklePoints(entri.latLng, entri.timing);
+              }),
           onLongPress: () => setS(() {
                 setIndex(tappedPoints.indexOf(entri));
 
-                if (isDeleting) tappedPoints.remove(entri);
+                // if (isDeleting) {
+                //   tappedPoints.remove(entri);
+                //   resetdELETING();
+                // }
               }),
           onTapUp: (details) => setIndex(-1)),
     );
@@ -98,6 +110,9 @@ List<Widget> actions(
                           if (index == -1) return;
                           tappedPoints[index].timing =
                               tappedPoints[index].timing + 1;
+                          tappedPoints[index].points = drawCirklePoints(
+                              tappedPoints[index].latLng,
+                              tappedPoints[index].timing);
                         }),
                     icon: Icon(Icons.add_circle)),
                 IconButton(
@@ -108,6 +123,9 @@ List<Widget> actions(
                           if (tappedPoints[index].timing == 0) return;
                           tappedPoints[index].timing =
                               tappedPoints[index].timing - 1;
+                          tappedPoints[index].points = drawCirklePoints(
+                              tappedPoints[index].latLng,
+                              tappedPoints[index].timing);
                         }),
                     icon: Icon(Icons.do_not_disturb_on))
               ],
