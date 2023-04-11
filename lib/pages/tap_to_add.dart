@@ -33,6 +33,8 @@ class TapToAddPageState extends State<TapToAddPage> {
   double x = 0;
   double y = 0;
   var p = 0.017453292519943295;
+
+  List<Marker> allCircleMarkers = [];
   @override
   void initState() {
     // mapController.mapEventStream.listen((event) {
@@ -44,8 +46,8 @@ class TapToAddPageState extends State<TapToAddPage> {
 
   @override
   Widget build(BuildContext context) {
-    markers = getMarkers(tappedPoints, setState, (i) => index = i,
-        isDeleting, () => isDeleting = false);
+    markers = getMarkers(tappedPoints, setState, (i) => index = i, isDeleting,
+        () => isDeleting = false);
 
     var listLatLng = tappedPoints.map((e) => e.latLng).toList();
     if (markers.length > 1) {
@@ -57,7 +59,7 @@ class TapToAddPageState extends State<TapToAddPage> {
       appBar: AppBar(
         title: const Text('Tap to add pins'),
         actions: actions(tappedPoints, setState, index, isDeleting,
-            () => setState(() => isDeleting = !isDeleting), (i) => index = i),
+            () => setState(() => isDeleting = !isDeleting), (i) => index = i,reDrawCircleMarkers),
       ),
       drawer: buildDrawer(context, TapToAddPage.route),
       body: Padding(
@@ -111,7 +113,7 @@ class TapToAddPageState extends State<TapToAddPage> {
                       polylines: [Polyline(points: listLatLng)],
                     ),
                     MarkerLayer(markers: markers),
-                    MarkerLayer(markers: tappedPoints.fold([], (previousValue, element) => previousValue..addAll(element.points))),
+                    MarkerLayer(markers: allCircleMarkers),
                   ],
                 ),
               ),
@@ -122,15 +124,28 @@ class TapToAddPageState extends State<TapToAddPage> {
     );
   }
 
-  void _handleTap(TapPosition tapPosition, LatLng latlng) {
+  void _handleTap(TapPosition tapPosition, LatLng latlng)  {
     final latLngCircle = LatLngCircle(
         latLng: latlng,
         timing: 1,
         editing: false,
-        points: drawCirklePoints(latlng, 1));
+        markersBigCircle: drawCirklePoints(latlng, 1, 1),
+        markersSmallCircle: drawCirklePoints(latlng, 1, 0));
     tappedPoints.add(latLngCircle);
     index = tappedPoints.indexOf(latLngCircle);
+setState(() {
+  
+});
+  }
 
+  Future<void> reDrawCircleMarkers() async {
+    allCircleMarkers = tappedPoints.fold(
+        [],
+        (previousValue, element) => previousValue
+          ..addAll(element.markersBigCircle)
+          ..addAll(element.markersSmallCircle));
     setState(() {});
+    await Future.delayed(const Duration(seconds: 1));
+    allCircleMarkers.clear();
   }
 }

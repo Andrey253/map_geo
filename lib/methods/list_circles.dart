@@ -51,7 +51,10 @@ List<Marker> getMarkers(
               }),
           onLongPressUp: () => setS(() {
                 setIndex(-1);
-                entri.points = drawCirklePoints(entri.latLng, entri.timing);
+                entri.markersBigCircle =
+                    drawCirklePoints(entri.latLng, entri.timing, 1);
+                entri.markersSmallCircle =
+                    drawCirklePoints(entri.latLng, entri.timing, 0);
               }),
           onLongPress: () => setS(() {
                 setIndex(tappedPoints.indexOf(entri));
@@ -72,7 +75,8 @@ List<Widget> actions(
     int index,
     bool isDeleting,
     Function() reversIsDeleting,
-    Function(int) setIndex) {
+    Function(int) setIndex,
+    Function() reDraw) {
   return [
     TextButton(
         onPressed: reversIsDeleting,
@@ -81,18 +85,23 @@ List<Widget> actions(
                 color: Colors.white,
                 child: Text('Нажмите на маркер для удаления'))
             : ColoredBox(color: Colors.white, child: Text('Удалить вышку'))),
+    IconButton(
+        constraints: const BoxConstraints(),
+        padding: EdgeInsets.zero,
+        onPressed: reDraw,
+        icon: const Icon(Icons.refresh_outlined)),
     Container(
         width: 100,
         color: Colors.orange,
         child: Row(
           children: [
             IconButton(
-                constraints: BoxConstraints(),
+                constraints: const BoxConstraints(),
                 padding: EdgeInsets.zero,
                 onPressed: () => setS(() {
                       setIndex(-1);
                     }),
-                icon: Icon(Icons.highlight_off)),
+                icon: const Icon(Icons.highlight_off)),
             SizedBox(
               width: 20,
               child: Center(
@@ -110,9 +119,12 @@ List<Widget> actions(
                           if (index == -1) return;
                           tappedPoints[index].timing =
                               tappedPoints[index].timing + 1;
-                          tappedPoints[index].points = drawCirklePoints(
-                              tappedPoints[index].latLng,
-                              tappedPoints[index].timing);
+                          tappedPoints[index].markersBigCircle =
+                              drawCirklePoints(tappedPoints[index].latLng,
+                                  tappedPoints[index].timing, 1);
+                          tappedPoints[index].markersSmallCircle =
+                              drawCirklePoints(tappedPoints[index].latLng,
+                                  tappedPoints[index].timing, 0);
                         }),
                     icon: Icon(Icons.add_circle)),
                 IconButton(
@@ -123,9 +135,12 @@ List<Widget> actions(
                           if (tappedPoints[index].timing == 0) return;
                           tappedPoints[index].timing =
                               tappedPoints[index].timing - 1;
-                          tappedPoints[index].points = drawCirklePoints(
-                              tappedPoints[index].latLng,
-                              tappedPoints[index].timing);
+                          tappedPoints[index].markersBigCircle =
+                              drawCirklePoints(tappedPoints[index].latLng,
+                                  tappedPoints[index].timing, 1);
+                          tappedPoints[index].markersSmallCircle =
+                              drawCirklePoints(tappedPoints[index].latLng,
+                                  tappedPoints[index].timing, 0);
                         }),
                     icon: Icon(Icons.do_not_disturb_on))
               ],
