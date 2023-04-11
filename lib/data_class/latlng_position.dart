@@ -1,36 +1,30 @@
-import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+
+import 'package:map_test/data_class/double_latlng.dart';
 
 class LatLngCircle {
   LatLng latLng;
   int timing;
   bool editing;
-  List<Marker> markersBigCircle;
-  List<Marker> markersSmallCircle;
+  List<DoubleLatLng> listDouobleLatLng;
   LatLngCircle({
     required this.latLng,
     required this.timing,
     required this.editing,
-    required this.markersBigCircle,
-    required this.markersSmallCircle,
+    required this.listDouobleLatLng,
   });
-
 
   LatLngCircle copyWith({
     LatLng? latLng,
     int? timing,
     bool? editing,
-    List<Marker>? markersBigCircle,
-    List<Marker>? markersSmallCircle,
+    List<DoubleLatLng>? markersCircle,
   }) {
     return LatLngCircle(
       latLng: latLng ?? this.latLng,
       timing: timing ?? this.timing,
       editing: editing ?? this.editing,
-      markersBigCircle: markersBigCircle ?? this.markersBigCircle,
-      markersSmallCircle: markersSmallCircle ?? this.markersSmallCircle,
+      listDouobleLatLng: markersCircle ?? this.listDouobleLatLng,
     );
   }
-
- 
 }

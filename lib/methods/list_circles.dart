@@ -32,7 +32,8 @@ List<Marker> getMarkers(
     void Function(Function()) setS,
     Function(int) setIndex,
     bool isDeleting,
-    Function() resetdELETING) {
+    Function() resetdELETING,
+    Function() reDrow) {
   return tappedPoints.map((entri) {
     return Marker(
       width: 80,
@@ -51,10 +52,10 @@ List<Marker> getMarkers(
               }),
           onLongPressUp: () => setS(() {
                 setIndex(-1);
-                entri.markersBigCircle =
-                    drawCirklePoints(entri.latLng, entri.timing, 1);
-                entri.markersSmallCircle =
-                    drawCirklePoints(entri.latLng, entri.timing, 0);
+                entri.listDouobleLatLng =
+                    drawCirklePoints(entri.latLng, entri.timing);
+
+                reDrow();
               }),
           onLongPress: () => setS(() {
                 setIndex(tappedPoints.indexOf(entri));
@@ -119,12 +120,11 @@ List<Widget> actions(
                           if (index == -1) return;
                           tappedPoints[index].timing =
                               tappedPoints[index].timing + 1;
-                          tappedPoints[index].markersBigCircle =
+                          tappedPoints[index].listDouobleLatLng =
                               drawCirklePoints(tappedPoints[index].latLng,
-                                  tappedPoints[index].timing, 1);
-                          tappedPoints[index].markersSmallCircle =
-                              drawCirklePoints(tappedPoints[index].latLng,
-                                  tappedPoints[index].timing, 0);
+                                  tappedPoints[index].timing);
+
+                          reDraw();
                         }),
                     icon: Icon(Icons.add_circle)),
                 IconButton(
@@ -135,12 +135,11 @@ List<Widget> actions(
                           if (tappedPoints[index].timing == 0) return;
                           tappedPoints[index].timing =
                               tappedPoints[index].timing - 1;
-                          tappedPoints[index].markersBigCircle =
+                          tappedPoints[index].listDouobleLatLng =
                               drawCirklePoints(tappedPoints[index].latLng,
-                                  tappedPoints[index].timing, 1);
-                          tappedPoints[index].markersSmallCircle =
-                              drawCirklePoints(tappedPoints[index].latLng,
-                                  tappedPoints[index].timing, 0);
+                                  tappedPoints[index].timing);
+   
+                          reDraw();
                         }),
                     icon: Icon(Icons.do_not_disturb_on))
               ],
