@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:map_test/data_class/double_latlng.dart';
 import 'package:map_test/widgets/drawer.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:positioned_tap_detector_2/positioned_tap_detector_2.dart';
@@ -72,14 +73,11 @@ class TapToAddPageState extends State<TapToAddPage> {
         padding: const EdgeInsets.all(8),
         child: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.only(top: 8, bottom: 8),
-              child: Text(
-                  index != -1 ? tappedPoints[index].latLng.toString() : ''),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 8, bottom: 8),
-              child: Text(dist.toString()),
+            Row(
+              children: [
+                Text(index != -1 ? tappedPoints[index].latLng.toString() : ''),
+                Text(dist.toString()),
+              ],
             ),
             Flexible(
               child: Listener(
@@ -142,42 +140,56 @@ class TapToAddPageState extends State<TapToAddPage> {
   }
 
   void reDrawCircleMarkers() {
-    // allCircleMarkers = tappedPoints.fold(
-    //     [],
-    //     (previousValue, element) => previousValue
-    //       ..addAll(markerOfCircle(element.listDouobleLatLng.map((e) => e.big).toList(),true))
-    //       ..addAll(markerOfCircle(element.listDouobleLatLng.map((e) => e.small).toList(),false)));
-    double up(double num) {
-      return num > 0 ? num * 1.01 : num * 0.99;
-    }
-
-    double down(double num) {
-      return num < 0 ? num * 1.01 : num * 0.99;
-    }
-
-    if (tappedPoints.length == 2) {
+    if (tappedPoints.length > 1) {
       allCircleMarkers.clear();
-      for (var d in tappedPoints[0].listDouobleLatLng) {
-        for (var big in tappedPoints[1].listDouobleLatLng.map((e) => e.big)) {
-          if (((up(d.big.latitude) > big.latitude &&
-                      down(d.small.latitude) < big.latitude) ||
-                  (down(d.big.latitude) < big.latitude &&
-                      up(d.small.latitude) > big.latitude)) &&
-              //////
-              ((up(d.big.longitude) > big.longitude &&
-                      down(d.small.longitude) < big.longitude) ||
-                  (down(d.big.longitude) < big.longitude &&
-                      up(d.small.longitude) > big.longitude))) {
-            allCircleMarkers.add(Marker(
-                point: big,
-                builder: (context) =>
-                    const Icon(Icons.lens, size: 8, color: Colors.blue)));
+      for (int i = 0; i < tappedPoints.length-1; i++) {
+        for (var d in tappedPoints[0].listDouobleLatLng) {
+          for (var big in tappedPoints[i+1].listDouobleLatLng.map((e) => e.big)) {
+            searchingArea(d, big);
+          }
+          for (var big
+              in tappedPoints[1].listDouobleLatLng.map((e) => e.small)) {
+            searchingArea(d, big);
+          }
+        }
+        for (var d in tappedPoints[1].listDouobleLatLng) {
+          for (var big in tappedPoints[0].listDouobleLatLng.map((e) => e.big)) {
+            searchingArea(d, big);
+          }
+          for (var big
+              in tappedPoints[0].listDouobleLatLng.map((e) => e.small)) {
+            searchingArea(d, big);
           }
         }
       }
     }
     setState(() {});
-    // await Future.delayed(const Duration(seconds: 1));
-    // allCircleMarkers.clear();
+  }
+
+  void searchingArea(DoubleLatLng d, LatLng big) {
+    double degree = 0.002;
+    if (((d.big.latitude >= big.latitude && d.small.latitude <= big.latitude) ||
+            (d.big.latitude <= big.latitude &&
+                d.small.latitude >= big.latitude)) &&
+        //////
+        ((d.big.longitude >= big.longitude &&
+                d.small.longitude <= big.longitude) ||
+            (d.big.longitude <= big.longitude &&
+                d.small.longitude >= big.longitude))) {
+      allCircleMarkers.add(Marker(
+          point: big,
+          builder: (context) =>
+              const Icon(Icons.lens, size: 8, color: Colors.blue)));
+    }
+  }
+}
+
+extension UpAndDoun on double {
+  double up([double degree = 0.00002]) {
+    return this > 0 ? this + degree : this - degree;
+  }
+
+  double down([double degree = 0.00002]) {
+    return this < 0 ? this - degree : this + degree;
   }
 }
