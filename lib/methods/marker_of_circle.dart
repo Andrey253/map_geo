@@ -17,28 +17,28 @@ List<Marker> markerOfCircle(List<LatLng> latLngList, bool big) {
 
 List<DoubleLatLng> drawCirklePoints(LatLng latLng, int timing) {
   List<DoubleLatLng> points = [];
-  final t = 1.01;
+  const t = 1.005;
   for (double alpha = 0; alpha < pi * 2; alpha += 0.1) {
     points.add(DoubleLatLng(
         big: LatLng(
             latLng.latitude +
                 sin(alpha) *
                     (timing + 1) *
-                    TapToAddPage.timingDistance*t /
+                    TapToAddPage.timingDistance *t/
                     111195,
             latLng.longitude +
                 (cos(alpha) *
                     (timing + 1) *
-                    TapToAddPage.timingDistance /
-                    111195 *t/
+                    TapToAddPage.timingDistance*t /
+                    111195 /
                     (cos(latLng.latitude * pi / 180)))),
         small: LatLng(
             latLng.latitude +
-                sin(alpha) * (timing) * TapToAddPage.timingDistance / 111195/t,
+                sin(alpha) * (timing) * TapToAddPage.timingDistance*t / 111195,
             latLng.longitude +
                 (cos(alpha) *
                     (timing) *
-                    TapToAddPage.timingDistance /t/
+                    TapToAddPage.timingDistance *t/
                     111195 /
                     (cos(latLng.latitude * pi / 180))))));
   }

@@ -140,47 +140,57 @@ class TapToAddPageState extends State<TapToAddPage> {
   }
 
   void reDrawCircleMarkers() {
-    if (tappedPoints.length > 1) {
       allCircleMarkers.clear();
-      for (int i = 0; i < tappedPoints.length-1; i++) {
-        for (var d in tappedPoints[0].listDouobleLatLng) {
-          for (var big in tappedPoints[i+1].listDouobleLatLng.map((e) => e.big)) {
-            searchingArea(d, big);
-          }
-          for (var big
-              in tappedPoints[1].listDouobleLatLng.map((e) => e.small)) {
-            searchingArea(d, big);
-          }
+    if (tappedPoints.length > 1) {
+      for (var d in tappedPoints[0].listDouobleLatLng) {
+        for (var big in tappedPoints[1].listDouobleLatLng.map((e) => e.big)) {
+          searchingArea(d, big);
         }
-        for (var d in tappedPoints[1].listDouobleLatLng) {
-          for (var big in tappedPoints[0].listDouobleLatLng.map((e) => e.big)) {
-            searchingArea(d, big);
-          }
-          for (var big
-              in tappedPoints[0].listDouobleLatLng.map((e) => e.small)) {
-            searchingArea(d, big);
-          }
+        for (var big in tappedPoints[1].listDouobleLatLng.map((e) => e.small)) {
+          searchingArea(d, big);
         }
+      }
+      for (var d in tappedPoints[1].listDouobleLatLng) {
+        for (var latLng
+            in tappedPoints[0].listDouobleLatLng.map((e) => e.big)) {
+          searchingArea(d, latLng);
+        }
+        for (var smal
+            in tappedPoints[0].listDouobleLatLng.map((e) => e.small)) {
+          searchingArea(d, smal);
+        }
+        //нарисовать и на третий, а последний убирет все лишнее
+      // if(tappedPoints.length > 2){
+      //    for (var smal
+      //       in tappedPoints[2].listDouobleLatLng.map((e) => e.small)) {
+      //     //  убираем лишние маркеры
+      //   }
+      // }
+      //
       }
     }
     setState(() {});
   }
 
   void searchingArea(DoubleLatLng d, LatLng big) {
-    double degree = 0.002;
-    if (((d.big.latitude >= big.latitude && d.small.latitude <= big.latitude) ||
-            (d.big.latitude <= big.latitude &&
-                d.small.latitude >= big.latitude)) &&
-        //////
-        ((d.big.longitude >= big.longitude &&
-                d.small.longitude <= big.longitude) ||
-            (d.big.longitude <= big.longitude &&
-                d.small.longitude >= big.longitude))) {
+    if (condition(d, big)) {
       allCircleMarkers.add(Marker(
           point: big,
           builder: (context) =>
               const Icon(Icons.lens, size: 8, color: Colors.blue)));
     }
+  }
+
+  bool condition(DoubleLatLng d, LatLng l) {
+    return ((d.big.latitude >= l.latitude &&
+                d.small.latitude <= l.latitude) ||
+            (d.big.latitude <= l.latitude &&
+                d.small.latitude >= l.latitude)) &&
+        //////
+        ((d.big.longitude >= l.longitude &&
+                d.small.longitude <= l.longitude) ||
+            (d.big.longitude <= l.longitude &&
+                d.small.longitude >= l.longitude));
   }
 }
 
