@@ -36,6 +36,7 @@ class TapToAddPageState extends State<TapToAddPage> {
   var p = 0.017453292519943295;
 
   List<Marker> allCircleMarkers = [];
+  List<Marker> _markers = [];
   @override
   void initState() {
     // mapController.mapEventStream.listen((event) {
@@ -68,7 +69,7 @@ class TapToAddPageState extends State<TapToAddPage> {
             (i) => index = i,
             reDrawCircleMarkers),
       ),
-      drawer: buildDrawer(context, TapToAddPage.route),
+      // drawer: buildDrawer(context, TapToAddPage.route),
       body: Padding(
         padding: const EdgeInsets.all(8),
         child: Column(
@@ -117,7 +118,7 @@ class TapToAddPageState extends State<TapToAddPage> {
                       polylines: [Polyline(points: listLatLng)],
                     ),
                     MarkerLayer(markers: markers),
-                    MarkerLayer(markers: allCircleMarkers),
+                    MarkerLayer(markers: _markers),
                   ],
                 ),
               ),
@@ -142,43 +143,47 @@ class TapToAddPageState extends State<TapToAddPage> {
   void reDrawCircleMarkers() {
     int length = tappedPoints.length;
     allCircleMarkers.clear();
+
     if (tappedPoints.length > 1) {
       for (int ii = 0; ii < length; ii++) {
         for (int i = 0; i < length; i++) {
+          final color = Random().nextInt(18);
           for (var d in tappedPoints[i].listDouobleLatLng) {
-            for (var big in tappedPoints[ii]
-                .listDouobleLatLng
-                .map((e) => e.big)) {
-         if(i!=ii)     searchingArea(d, big);
+            for (var big
+                in tappedPoints[ii].listDouobleLatLng.map((e) => e.big)) {
+              if (i != ii) searchingArea(d, big, color);
             }
-            for (var small in tappedPoints[ii]
-                .listDouobleLatLng
-                .map((e) => e.small)) {
-                  if(i!=ii)  searchingArea(d, small);
+            for (var small
+                in tappedPoints[ii].listDouobleLatLng.map((e) => e.small)) {
+              if (i != ii) searchingArea(d, small, color);
             }
           }
         }
-        // for (var d in tappedPoints[(i + 1)%length].listDouobleLatLng) {
-        //   for (var latLng
-        //       in tappedPoints[i].listDouobleLatLng.map((e) => e.big)) {
-        //     searchingArea(d, latLng);
-        //   }
-        //   for (var smal
-        //       in tappedPoints[i].listDouobleLatLng.map((e) => e.small)) {
-        //     searchingArea(d, smal);
-        //   }
+      }
+      _markers=List.from(allCircleMarkers);
+      // for (int ii = allCircleMarkers.length - 1; ii >= 0; ii--) {
+      for (int ii = 0; ii < allCircleMarkers.length; ii++) {
+        for (int i = 0; i < tappedPoints[0].listDouobleLatLng.length; i++) {
+          if (!condition(tappedPoints[0].listDouobleLatLng[i],
+                  allCircleMarkers[ii].point) ) {
+            print('teg _markers ${_markers.length}');
+
+            _markers.removeWhere((element) => allCircleMarkers[ii].point==element.point);
+          }
+        }
         // }
       }
+      // condition(doubleLatLng, allCircleMarker.point)
     }
     setState(() {});
   }
 
-  void searchingArea(DoubleLatLng d, LatLng big) {
+  void searchingArea(DoubleLatLng d, LatLng big, int color) {
     if (condition(d, big)) {
       allCircleMarkers.add(Marker(
           point: big,
           builder: (context) =>
-              const Icon(Icons.lens, size: 4, color: Colors.blue)));
+              Icon(Icons.lens, size: 4, color: Colors.primaries[color])));
     }
   }
 

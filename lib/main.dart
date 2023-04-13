@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: mapBoxBlue,
       ),
-      home: const HomePage(),
+      home: const TapToAddPage(),
       routes: <String, WidgetBuilder>{
         TapToAddPage.route: (context) => const TapToAddPage(),
         AnimatedMapControllerPage.route: (context) =>

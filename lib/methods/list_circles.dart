@@ -9,7 +9,7 @@ List<CircleMarker> getListCircles(List<LatLngCircle> tappedPoints) {
   return tappedPoints
       .map((e) => CircleMarker(
           point: e.latLng,
-          color: Colors.black.withOpacity(0.2),
+          color: Colors.black.withOpacity(0.4),
           borderStrokeWidth: 1,
           useRadiusInMeter: true,
           borderColor: Colors.white,
@@ -79,16 +79,18 @@ List<Widget> actions(
     Function(int) setIndex,
     Function() reDraw) {
   return [
-    TextButton(
-        onPressed: reversIsDeleting,
-        child: isDeleting
-            ? ColoredBox(
-                color: Colors.white,
-                child: Text('Нажмите на маркер для удаления'))
-            : ColoredBox(color: Colors.white, child: Text('Удалить вышку'))),
+    Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+          onPressed: reversIsDeleting,
+          child: isDeleting
+              ? const Text('Нажмите на маркер для удаления')
+              : const Text('Удалить вышку')),
+    ),
     IconButton(
-        constraints: const BoxConstraints(),
-        padding: EdgeInsets.zero,
+        // constraints: const BoxConstraints(),
+        // padding: EdgeInsets.zero,
         onPressed: reDraw,
         icon: const Icon(Icons.refresh_outlined)),
     Container(
@@ -97,8 +99,8 @@ List<Widget> actions(
         child: Row(
           children: [
             IconButton(
-                constraints: const BoxConstraints(),
-                padding: EdgeInsets.zero,
+                // constraints: const BoxConstraints(),
+                // padding: EdgeInsets.zero,
                 onPressed: () => setS(() {
                       setIndex(-1);
                     }),
@@ -138,7 +140,7 @@ List<Widget> actions(
                           tappedPoints[index].listDouobleLatLng =
                               drawCirklePoints(tappedPoints[index].latLng,
                                   tappedPoints[index].timing);
-   
+
                           reDraw();
                         }),
                     icon: Icon(Icons.do_not_disturb_on))
