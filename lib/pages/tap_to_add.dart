@@ -140,33 +140,34 @@ class TapToAddPageState extends State<TapToAddPage> {
   }
 
   void reDrawCircleMarkers() {
-      allCircleMarkers.clear();
+    int length = tappedPoints.length;
+    allCircleMarkers.clear();
     if (tappedPoints.length > 1) {
-      for (var d in tappedPoints[0].listDouobleLatLng) {
-        for (var big in tappedPoints[1].listDouobleLatLng.map((e) => e.big)) {
-          searchingArea(d, big);
+      for (int ii = 0; ii < length; ii++) {
+        for (int i = 0; i < length; i++) {
+          for (var d in tappedPoints[i].listDouobleLatLng) {
+            for (var big in tappedPoints[ii]
+                .listDouobleLatLng
+                .map((e) => e.big)) {
+         if(i!=ii)     searchingArea(d, big);
+            }
+            for (var small in tappedPoints[ii]
+                .listDouobleLatLng
+                .map((e) => e.small)) {
+                  if(i!=ii)  searchingArea(d, small);
+            }
+          }
         }
-        for (var big in tappedPoints[1].listDouobleLatLng.map((e) => e.small)) {
-          searchingArea(d, big);
-        }
-      }
-      for (var d in tappedPoints[1].listDouobleLatLng) {
-        for (var latLng
-            in tappedPoints[0].listDouobleLatLng.map((e) => e.big)) {
-          searchingArea(d, latLng);
-        }
-        for (var smal
-            in tappedPoints[0].listDouobleLatLng.map((e) => e.small)) {
-          searchingArea(d, smal);
-        }
-        //нарисовать и на третий, а последний убирет все лишнее
-      // if(tappedPoints.length > 2){
-      //    for (var smal
-      //       in tappedPoints[2].listDouobleLatLng.map((e) => e.small)) {
-      //     //  убираем лишние маркеры
-      //   }
-      // }
-      //
+        // for (var d in tappedPoints[(i + 1)%length].listDouobleLatLng) {
+        //   for (var latLng
+        //       in tappedPoints[i].listDouobleLatLng.map((e) => e.big)) {
+        //     searchingArea(d, latLng);
+        //   }
+        //   for (var smal
+        //       in tappedPoints[i].listDouobleLatLng.map((e) => e.small)) {
+        //     searchingArea(d, smal);
+        //   }
+        // }
       }
     }
     setState(() {});
@@ -177,18 +178,15 @@ class TapToAddPageState extends State<TapToAddPage> {
       allCircleMarkers.add(Marker(
           point: big,
           builder: (context) =>
-              const Icon(Icons.lens, size: 8, color: Colors.blue)));
+              const Icon(Icons.lens, size: 4, color: Colors.blue)));
     }
   }
 
   bool condition(DoubleLatLng d, LatLng l) {
-    return ((d.big.latitude >= l.latitude &&
-                d.small.latitude <= l.latitude) ||
-            (d.big.latitude <= l.latitude &&
-                d.small.latitude >= l.latitude)) &&
+    return ((d.big.latitude >= l.latitude && d.small.latitude <= l.latitude) ||
+            (d.big.latitude <= l.latitude && d.small.latitude >= l.latitude)) &&
         //////
-        ((d.big.longitude >= l.longitude &&
-                d.small.longitude <= l.longitude) ||
+        ((d.big.longitude >= l.longitude && d.small.longitude <= l.longitude) ||
             (d.big.longitude <= l.longitude &&
                 d.small.longitude >= l.longitude));
   }
